@@ -1,78 +1,71 @@
 export declare namespace JSX {
     interface IntrinsicElements {
         [elemName: string]: any
-        "m:use": {
-            src: string,
-            raw?: boolean,
-        }
     }
     interface ElementAttributesProperty {
         props: any;
     }
     type Element = string
+    type Children = Element | string | (Element | string)[] | undefined
+    type Attr = {
+        tag: Element | string,
+        children: Children
+    }
 }
+
+const normalChildren = (children: JSX.Children) => {
+    children = children || []
+    if (!Array.isArray(children)) children = [children]
+    return children
+}
+
+const components: Record<string, (props: JSX.Attr) => string> = {
+    h1: ({children}) => {
+        children = normalChildren(children)
+        return `# ${children.join("")}`
+    }
+}
+
+const omit = (o: any, k: string) =>
+    Object.fromEntries(
+        Object.entries(o)
+        .filter(([x]) => x != k)
+    )
 
 type Factory<T> =
     (
         tag: T | string,
-        attr: {
-            [key: string]: any
-            children?: T | string | (T | string)[]
-        }
-    ) => T | string
+        attr: JSX.Attr,
+    ) => string
 
     const jsx: Factory<(arg: any) => JSX.Element> =
     (tag, att) => {
-        console.log(tag)
-        if (typeof tag == "function")
-            return tag(att)
+        const children = normalChildren(att.children)
 
         if (typeof tag == "string") {
-            if (tag == "m:importMap") {
+            if (tag in components) {
+                return components[tag](att)
+            } else {
+                const props =
+                    Object.entries(omit(att, "children"))
+                        .map(([k, v]) => `${k}="${v}"`)
+                        .join(" ")
                 return ``
-                    +`<script type="importmap">`
-                    +Deno.readTextFileSync(att.src)
-                    +`</script>`
+                    +`<${tag}${props.length ? " " : ""}${props}>`
+                    +`${children.join("")}`
+                    +`</${tag}>`
             }
-            if (tag =="m:use") {
-                if (att.src.endsWith(".css")) {
-                    if (att.raw) {
-                        return ``
-                            +`<style>`
-                            +Deno.readTextFileSync(att.src)
-                            +`</style>`
-                    }
-                    return ``
-                        +`<link rel="stylesheet" `
-                        +`href="${att.src}" `
-                        +`type="text/css"></link>`
-                }
-                return ``
-                    +`<script type="module" `
-                    + (att.raw
-                        ? (">"+Deno.readTextFileSync(att.src))
-                        : `src="${att.src}">`)
-                    +`</script>`
-            }
-            let { children } = att
-            if (!children) children = []
-            if (!Array.isArray(children)) children = [children]
-
-            const props =
-                Object.entries(att)
-                    .filter(([k]) => k != "children")
-                    .map(([k, v]) => `${k}="${v}"`)
-                    .join(" ")
-        
-            return ``
-                +`<${tag} ${props}>`
-                +`${children.join("")}`
-                +`</${tag}>`
+        }
+        if (typeof tag == "function") {
+            return tag(att)
         }
         return ""
     }
 
-export const Fragment = "div"
+export const Fragment =
+    ({children}: JSX.Attr) =>
+    normalChildren(children)
+        .join("")
 
 export {
     jsx,
