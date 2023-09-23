@@ -19,11 +19,14 @@ const normalChildren = (children: JSX.Children) => {
     return children
 }
 
+const $ =
+    (f: (s: string) => string) =>
+    ({children}: JSX.Attr) =>
+    f(normalChildren(children).join(""))
+
 const components: Record<string, (props: JSX.Attr) => string> = {
-    h1: ({children}) => {
-        children = normalChildren(children)
-        return `# ${children.join("")}`
-    }
+    h1: $(s => `# ${s}`),
+    p: $(s => `\n${s}\n`),
 }
 
 const omit = (o: any, k: string) =>
