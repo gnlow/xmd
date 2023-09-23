@@ -20,13 +20,21 @@ const normalChildren = (children: JSX.Children) => {
 }
 
 const $ =
-    (f: (s: string) => string) =>
-    ({children}: JSX.Attr) =>
-    f(normalChildren(children).join(""))
+    (f: (s: string, att: any) => string) =>
+    ({children, ...att}: JSX.Attr) =>
+    f(normalChildren(children).join(""), att)
 
-const components: Record<string, (props: JSX.Attr) => string> = {
-    h1: $(s => `# ${s}`),
-    p: $(s => `\n${s}\n`),
+const indent =
+    (s: string) =>
+    s.split("\n").join("\n    ")
+
+const components: Record<string, (s: string, props: any) => string> = {
+    h1: s => `# ${s}`,
+    p: s => `\n${s}\n`,
+    ul: s => indent(s),
+    li: s => `- ${s}`,
+    a: (s, {href}) => `[${s}](${href})`,
+    hr: () => `---`,
 }
 
 const omit = (o: any, k: string) =>
@@ -47,7 +55,7 @@ type Factory<T> =
 
         if (typeof tag == "string") {
             if (tag in components) {
-                return components[tag](att)
+                return $(components[tag])(att)
             } else {
                 const props =
                     Object.entries(omit(att, "children"))
@@ -60,15 +68,12 @@ type Factory<T> =
             }
         }
         if (typeof tag == "function") {
-            return tag(att)
+            return $(tag)(att)
         }
         return ""
     }
 
-export const Fragment =
-    ({children}: JSX.Attr) =>
-    normalChildren(children)
-        .join("")
+export const Fragment = (s: string) => s
 
 export {
     jsx,

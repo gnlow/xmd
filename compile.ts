@@ -5,7 +5,7 @@ const tseval =
     import("data:application/javascript," + encodeURIComponent(code))
 
 const compiled = String(await compile(
-    await Deno.readTextFile("test.mdx"),
+    await Deno.readTextFile("test/README.mdx"),
     {
         jsxImportSource: "jsx"
     }
