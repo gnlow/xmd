@@ -7,14 +7,13 @@ const tseval =
 const [input] = Deno.args
 if (!input.endsWith(".mdx"))
     throw "File name should ends with `.mdx`."
-
+console.log(import.meta.url)
 const compiled = String(await compile(
     await Deno.readTextFile(input),
     {
-        jsxImportSource: "jsx"
+        jsxImportSource: "$jsx$"
     }
-))
-
+)).replace(`"$jsx$/jsx-runtime"`, `"${import.meta.url}/../src/jsx.ts"`)
 const {default: result} = await tseval(compiled)
 
 const output = input.substring(0, input.length-1)
