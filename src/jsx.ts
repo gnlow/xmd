@@ -30,8 +30,11 @@ const indent =
 
 const components: Record<string, (s: string, props: any) => string> = {
     h1: s => `# ${s}`,
-    p: s => `\n${s}\n`,
-    ul: s => indent(s),
+    h2: s => `## ${s}`,
+    h3: s => `### ${s}`,
+    h4: s => `#### ${s}`,
+    //p: s => `\n${s}\n`,
+    ul: s => s, //indent(s),
     li: s => `- ${s}`,
     a: (s, {href}) => `[${s}](${href})`,
     hr: () => `---`,

@@ -1,9 +1,14 @@
-export const Year = (s, {year}) =>
+export const Skills = (_, {s}) => <img
+    height="20px"
+    src={"https://skillicons.dev/icons?i=" + s}
+/>
+
+export const Year = (s, {year, skills}) =>
     <details>
         <summary>
-            <b><code>{year}</code></b>
+            <b><code>{year}</code></b> <Skills s={skills}/>
         </summary>
-        {s}
+        {"\n"+s}
     </details>
 
 - [/learn    ](https://github.com/gnlow-learn)
@@ -13,6 +18,21 @@ export const Year = (s, {year}) =>
 
 ---
 
-<Year year=" 2019">
-    Hi
+<p align="center">
+  <img width="100%" src="https://raw.githubusercontent.com/gnlow/gnlow/master/identity/gnlow/banner_220707.svg"/>
+  <img height="30px" src="./Heart.svg"/><br/>
+  <img height="30px" src="https://skillicons.dev/icons?i=deno,ts,svelte"/>
+</p>
+
+<Year
+    year=" 2019"
+    skills="js,html,css,jquery,vue,ts"
+>
+    ### Ent2ml <Skills s="js,html,css,jquery"/>
+    - 2019-01-09 ~ 2019-01-20
+    - 엔트리 유저별 좋아요/조회수를 정리해 보여주는 웹사이트
+
+    ### Ent2ml <Skills s="js,html,css,jquery"/>
+    - 2019-01-09 ~ 2019-01-20
+    - 엔트리 유저별 좋아요/조회수를 정리해 보여주는 웹사이트
 </Year>
