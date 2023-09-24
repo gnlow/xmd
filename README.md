@@ -1,7 +1,7 @@
 # xmd
 MDX -> MD
 
-```jsx
+```mdx
 export const Skills = (_, {s}) => <img
     height="20px"
     src={"https://skillicons.dev/icons?i=" + s}
