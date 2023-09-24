@@ -4,13 +4,22 @@ const tseval =
     (code: string) =>
     import("data:application/javascript," + encodeURIComponent(code))
 
+const [input] = Deno.args
+if (!input.endsWith(".mdx"))
+    throw "File name should ends with `.mdx`."
+
 const compiled = String(await compile(
-    await Deno.readTextFile("test/README.mdx"),
+    await Deno.readTextFile(input),
     {
         jsxImportSource: "jsx"
     }
 ))
 
-const {default: v} = await tseval(compiled)
+const {default: result} = await tseval(compiled)
 
-console.log(v())
+const output = input.substring(0, input.length-1)
+
+const text = `${input} -> ${output} `
+console.time(text)
+await Deno.writeTextFile(output, result())
+console.timeEnd(text)
